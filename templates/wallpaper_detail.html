@@ -1,10 +1,127 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
 
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}{{ wallpaper.title }} — Wallpapers{% endblock %}
+
+{% block content %}
+
+<section class="detail-section">
+
+    <a href="{% url 'home' %}" class="back-link">
+        ← Back to wallpapers
+    </a>
+
+    <div class="detail-card">
+
+        <div>
+            <img
+                src="{{ wallpaper.image.url }}"
+                alt="{{ wallpaper.title }}"
+                class="detail-image"
+            >
+        </div>
+
+        <div class="detail-info">
+
+            <span class="section-label">
+                {{ wallpaper.get_category_display|upper }}
+            </span>
+
+            <h1>{{ wallpaper.title }}</h1>
+
+            <p class="detail-description">
+                {% if wallpaper.description %}
+                    {{ wallpaper.description }}
+                {% else %}
+                    Beautiful wallpaper for your device.
+                {% endif %}
+            </p>
+
+            <div class="detail-meta">
+
+                <div>
+                    <span>Device</span>
+                    <strong>{{ wallpaper.get_device_type_display }}</strong>
+                </div>
+
+                <div>
+                    <span>Resolution</span>
+                    <strong>
+                        {{ wallpaper.resolution|default:"Not specified" }}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Downloads</span>
+                    <strong>{{ wallpaper.downloads }}</strong>
+                </div>
+
+                <div>
+                    <span>Added</span>
+                    <strong>{{ wallpaper.created_at|date:"d.m.Y" }}</strong>
+                </div>
+
+            </div>
+
+            <a
+                href="{{ wallpaper.image.url }}"
+                download
+                class="download-button"
+            >
+                ↓ Download wallpaper
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+{% if related_wallpapers %}
+
+<section class="gallery-section">
+
+    <div class="section-heading">
+        <div>
+            <span class="section-label">MORE INSPIRATION</span>
+            <h2>Related wallpapers</h2>
+        </div>
+    </div>
+
+    <div class="wallpaper-grid">
+
+        {% for item in related_wallpapers %}
+
+        <article class="wallpaper-card">
+
+            <a href="{% url 'wallpaper_detail' item.pk %}"
+               class="wallpaper-image-link">
+
+                <img
+                    src="{{ item.image.url }}"
+                    alt="{{ item.title }}"
+                    class="wallpaper-image"
+                    loading="lazy"
+                >
+
+            </a>
+
+            <div class="wallpaper-info">
+                <div>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.get_device_type_display }}</p>
+                </div>
+            </div>
+
+        </article>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

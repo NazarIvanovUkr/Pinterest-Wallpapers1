@@ -1,10 +1,192 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
 
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Explore Wallpapers — Wallpapers{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-content">
+        <span class="eyebrow">
+            <span class="status-dot"></span>
+            YOUR DAILY INSPIRATION
+        </span>
+
+        <h1>
+            Find your next<br>
+            <span>wallpaper.</span>
+        </h1>
+
+        <p>
+            Discover beautiful wallpapers for your desktop,
+            smartphone and creative setup.
+        </p>
+
+        <form method="GET" action="{% url 'home' %}" class="hero-search">
+            <span class="search-icon">⌕</span>
+
+            <input
+                type="text"
+                name="q"
+                placeholder="Search wallpapers..."
+                value="{{ search_query }}"
+            >
+
+            {% if selected_category %}
+                <input type="hidden" name="category" value="{{ selected_category }}">
+            {% endif %}
+
+            <button type="submit">Search</button>
+        </form>
+
+        <div class="hero-stats">
+            <div>
+                <strong>{{ total_wallpapers }}</strong>
+                <span>Wallpapers</span>
+            </div>
+
+            <div>
+                <strong>4K</strong>
+                <span>Quality options</span>
+            </div>
+
+            <div>
+                <strong>Free</strong>
+                <span>To explore</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-decoration">
+        <div class="hero-glow"></div>
+        <div class="hero-card hero-card-one">
+            <div class="hero-card-image image-one"></div>
+            <span>Discover something new</span>
+        </div>
+        <div class="hero-card hero-card-two">
+            <div class="hero-card-image image-two"></div>
+        </div>
+    </div>
+</section>
+
+
+<section class="categories-section" id="categories">
+
+    <div class="section-heading">
+        <div>
+            <span class="section-label">EXPLORE COLLECTIONS</span>
+            <h2>Browse categories</h2>
+        </div>
+    </div>
+
+    <div class="category-list">
+        <a href="{% url 'home' %}"
+           class="category-chip {% if not selected_category %}selected{% endif %}">
+            All
+        </a>
+
+        {% for value, label in categories %}
+            <a href="{% url 'home' %}?category={{ value }}"
+               class="category-chip {% if selected_category == value %}selected{% endif %}">
+                {{ label }}
+            </a>
+        {% endfor %}
+    </div>
+
+</section>
+
+
+<section class="gallery-section" id="gallery">
+
+    <div class="section-heading gallery-heading">
+        <div>
+            <span class="section-label">CURATED FOR YOU</span>
+            <h2>
+                {% if search_query %}
+                    Search results
+                {% elif selected_category %}
+                    {{ selected_category|title }} wallpapers
+                {% else %}
+                    Explore wallpapers
+                {% endif %}
+            </h2>
+        </div>
+
+        <span class="results-count">
+            {{ wallpapers|length }} results
+        </span>
+    </div>
+
+
+    <div class="wallpaper-grid">
+
+        {% for wallpaper in wallpapers %}
+
+            <article class="wallpaper-card">
+
+                <a href="{% url 'wallpaper_detail' wallpaper.pk %}"
+                   class="wallpaper-image-link">
+
+                    <img
+                        src="{{ wallpaper.image.url }}"
+                        alt="{{ wallpaper.title }}"
+                        class="wallpaper-image"
+                        loading="lazy"
+                    >
+
+                    <div class="wallpaper-overlay">
+                        <span class="image-category">
+                            {{ wallpaper.get_category_display }}
+                        </span>
+
+                        <button
+                            type="button"
+                            class="favorite-button"
+                            data-favorite="{{ wallpaper.pk }}"
+                            aria-label="Add to favorites"
+                            aria-pressed="false"
+                        >
+                            ♡
+                        </button>
+
+                        <span class="view-button">View wallpaper ↗</span>
+                    </div>
+
+                </a>
+
+                <div class="wallpaper-info">
+                    <div>
+                        <h3>{{ wallpaper.title }}</h3>
+                        <p>
+                            {{ wallpaper.get_device_type_display }}
+                            {% if wallpaper.resolution %}
+                                · {{ wallpaper.resolution }}
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <span class="download-count">
+                        ↓ {{ wallpaper.downloads }}
+                    </span>
+                </div>
+
+            </article>
+
+        {% empty %}
+
+            <div class="empty-state">
+                <div class="empty-icon">✦</div>
+                <h3>No wallpapers found</h3>
+                <p>Try another search or choose a different category.</p>
+                <a href="{% url 'home' %}" class="primary-button">
+                    Explore all wallpapers
+                </a>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}
